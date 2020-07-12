@@ -115,7 +115,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun updateChart(pieEntries: java.util.ArrayList<PieEntry>) {
-        val pieDateSet =  PieDataSet(pieEntries,"L")
+        val pieDateSet =  PieDataSet(pieEntries,"Income / Expences")
         pieDateSet.sliceSpace = 2f
         pieDateSet.selectionShift = 3f
         val colors = ArrayList<Int>()
