@@ -68,6 +68,9 @@ dependencies {
     //rxjava
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
 
+    //Mp chart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

@@ -17,6 +17,10 @@ import com.ankit.smsanalyzer.R
 import com.ankit.smsanalyzer.base.BaseActivity
 import com.ankit.smsanalyzer.common.Constants
 import com.ankit.smsanalyzer.databinding.ActivityMainBinding
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.utils.ColorTemplate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -58,6 +62,13 @@ class MainActivity : BaseActivity() {
                 }
             }
         })
+
+        viewModel.analizedData.observe(this, Observer {
+            val chartEntries = ArrayList<PieEntry>()
+            chartEntries.add(PieEntry(it.totalExpences.toFloat(),0))
+            chartEntries.add(PieEntry(it.totalIncome.toFloat(),1))
+            updateChart(chartEntries)
+        })
     }
 
     private fun loadSms() {
@@ -87,13 +98,36 @@ class MainActivity : BaseActivity() {
 
     /*
      * Recycler view setup with sms adapter.
+     * and pie chart setup
      */
     private fun initView() {
         binding.rvMain.layoutManager = LinearLayoutManager(this)
         binding.rvMain.itemAnimator = DefaultItemAnimator()
         binding.rvMain.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         binding.rvMain.adapter = adapter
+
+        val pieEntries = arrayListOf<PieEntry>().apply {
+            add(PieEntry(100f,0))
+            add(PieEntry(200f,1))
+        }
+       updateChart(pieEntries)
+
     }
+
+    private fun updateChart(pieEntries: java.util.ArrayList<PieEntry>) {
+        val pieDateSet =  PieDataSet(pieEntries,"L")
+        pieDateSet.sliceSpace = 2f
+        pieDateSet.selectionShift = 3f
+        val colors = ArrayList<Int>()
+        for (c in ColorTemplate.JOYFUL_COLORS) colors.add(c)
+        pieDateSet.colors = colors
+        val pieData = PieData(pieDateSet)
+        binding.pieChartMain.data = pieData;
+        // undo all highlights
+        binding.pieChartMain.highlightValues(null)
+        binding.pieChartMain.invalidate()
+    }
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
