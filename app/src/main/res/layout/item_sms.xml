@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="smsItem"
+            type="com.ankit.smsanalyzer.presentation.SmsItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/iv_user_profile"
+            android:layout_width="@dimen/profile_pic_size"
+            android:layout_height="@dimen/profile_pic_size"
+            android:layout_marginStart="@dimen/window_margin"
+            android:layout_marginTop="@dimen/window_margin_standard"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_sms_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/window_margin_standard"
+            android:layout_marginTop="@dimen/window_margin_standard"
+            android:layout_marginEnd="@dimen/window_margin_standard"
+            android:maxLines="1"
+            android:textColor="@color/text_color_title"
+            android:textSize="@dimen/text_size_title"
+            app:layout_constraintStart_toEndOf="@id/iv_user_profile"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/app_name"
+            android:text="@{smsItem.smsTitle??``}"
+            />
+
+        <TextView
+            android:id="@+id/tv_sms_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/window_margin_standard"
+            android:layout_marginEnd="@dimen/window_margin_standard"
+            android:layout_marginBottom="@dimen/window_margin_standard"
+            android:maxLines="3"
+            android:textColor="@color/text_color_content"
+            android:textSize="@dimen/text_size_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_user_profile"
+            app:layout_constraintTop_toBottomOf="@id/tv_sms_title"
+            tools:text="@string/app_name"
+            android:text="@{smsItem.content??``}"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,4 +1,4 @@
-package com.ankit.smsanalyzer
+package com.ankit.smsanalyzer.presentation
 
 import androidx.hilt.lifecycle.ViewModelInject
 import com.ankit.smsanalyzer.base.BaseViewModel
