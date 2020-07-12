@@ -1,39 +1,113 @@
 package com.ankit.smsanalyzer.presentation
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ankit.smsanalyzer.R
 import com.ankit.smsanalyzer.base.BaseActivity
+import com.ankit.smsanalyzer.common.Constants
 import com.ankit.smsanalyzer.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
+    private val TAG = MainActivity::class.java.simpleName
 
-    @Inject lateinit var adapter: SmsItemAdapter
+    @Inject
+    lateinit var adapter: SmsItemAdapter
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProviders.of(this)[MainViewModel::class.java]
-    }
+    @Inject
+    lateinit var smsItemList: ArrayList<SmsItem>
+
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.viewModel = viewModel
+        initObserver()
         initView()
+        loadSms()
     }
 
+    private fun initObserver() {
+        viewModel.smsList.observe(this, Observer {
+            when (it) {
+                is SmsListState.Success -> {
+                    tv_error_text.visibility = GONE
+                    smsItemList.clear()
+                    smsItemList.addAll(it.items)
+                    adapter.notifyDataSetChanged()
+                }
+                is SmsListState.Failed -> {
+                    tv_error_text.visibility = VISIBLE
+                    tv_error_text.text = it.trowable.message
+                }
+            }
+        })
+    }
+
+    private fun loadSms() {
+        if (checkSmsPermission()) {
+            viewModel.loadSmsList()
+        }
+    }
+
+    /*
+     * Check Read Sms permission if granted return success or return false.
+     */
+    private fun checkSmsPermission(): Boolean {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_SMS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_SMS),
+                Constants.READ_SMS_REQ_CODE
+            )
+            return false
+        }
+        return true
+    }
+
+    /*
+     * Recycler view setup with sms adapter.
+     */
     private fun initView() {
         binding.rvMain.layoutManager = LinearLayoutManager(this)
         binding.rvMain.itemAnimator = DefaultItemAnimator()
-        binding.rvMain.addItemDecoration(DividerItemDecoration(this,LinearLayoutManager.VERTICAL))
+        binding.rvMain.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         binding.rvMain.adapter = adapter
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == Constants.READ_SMS_REQ_CODE) {
+            Log.d(TAG, grantResults.size.toString())
+            if (grantResults.isNotEmpty()) {
+                viewModel.loadSmsList()
+            } else {
+                finish()
+            }
+        }
     }
 }
